@@ -7,41 +7,49 @@ import {
   Delete,
   Get,
   Query,
-} from '@nestjs/common';
-import { UserRoleService } from './user-role.service';
-import { UserRoleDTO } from './user-role.dto';
+  HttpException,
+  HttpStatus
+} from '@nestjs/common'
+import { UserRoleService } from './user-role.service'
+import { UserRoleDTO } from './user-role.dto'
 
 type GetAllQuery = {
-  page?: number;
-  limit?: number;
-};
+  page?: number
+  limit?: number
+}
 
-@Controller('user-role')
+@Controller()
 export class UserRoleController {
   constructor(private readonly service: UserRoleService) {}
 
-  @Post()
+  @Post('/user-role')
   create(@Body() data: UserRoleDTO) {
-    return this.service.create(data);
+    return this.service.create(data)
   }
 
-  @Put(':id')
-  update(@Param('id') id: number, @Body() data: UserRoleDTO) {
-    return this.service.update(id, data);
+  @Put('/user-role/:id')
+  async update(@Param('id') id: number, @Body() data: UserRoleDTO) {
+    const role = await this.service.findOne(id)
+    if (!role) throw new HttpException('Role not found', HttpStatus.NOT_FOUND)
+    return this.service.update(id, data)
   }
 
   @Delete(':id')
-  delete(@Param('id') id: number) {
-    return this.service.delete(id);
+  async delete(@Param('id') id: number) {
+    const role = await this.service.findOne(id)
+    if (!role) throw new HttpException('Role not found', HttpStatus.NOT_FOUND)
+    return this.service.delete(id)
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.service.findOne(id);
+  async findOne(@Param('id') id: number) {
+    const role = await this.service.findOne(id)
+    if (!role) throw new HttpException('Role not found', HttpStatus.NOT_FOUND)
+    return role
   }
 
   @Get()
   getAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
-    return this.service.getAll({ limit, page });
+    return this.service.getAll({ limit, page })
   }
 }

@@ -1,35 +1,46 @@
-import {
-  IsString,
-  Length,
-  IsDefined,
-  IsOptional,
-  IsJSON,
-  IsNumber,
-} from 'class-validator';
-import { CrudValidationGroups } from '@nestjsx/crud';
+import { Length, IsDefined, IsOptional } from 'class-validator'
+import { CrudValidationGroups } from '@nestjsx/crud'
 
-const { CREATE, UPDATE } = CrudValidationGroups;
+const { CREATE, UPDATE } = CrudValidationGroups
 
 export class UserDTO {
   @IsDefined({ groups: [CREATE] })
   @IsOptional({ groups: [UPDATE] })
-  roleId: number;
+  roleId?: number
 
   @IsDefined({ groups: [CREATE] })
   @IsOptional({ groups: [UPDATE] })
-  nik: number;
+  nik?: number
 
   @Length(2, 150)
   @IsDefined({ groups: [CREATE] })
   @IsOptional({ groups: [UPDATE] })
-  name: string;
+  name?: string
+
+  @Length(2, 150)
+  @IsDefined({ groups: [CREATE] })
+  @IsOptional({ groups: [UPDATE] })
+  username?: string
+
+  @Length(2, 150)
+  @IsDefined({ groups: [CREATE] })
+  @IsOptional({ groups: [UPDATE] })
+  password?: string
 
   @Length(2, 120)
   @IsDefined({ groups: [CREATE] })
   @IsOptional({ groups: [UPDATE] })
-  improvement: string;
+  improvement?: string
 
   @IsDefined({ groups: [CREATE] })
   @IsOptional({ groups: [UPDATE] })
-  picture?: any;
+  picture?: any
+}
+
+export class AuthDTO {
+  @IsDefined({ groups: [CREATE, UPDATE] })
+  username: string
+
+  @IsDefined({ groups: [CREATE, UPDATE] })
+  password: string
 }
