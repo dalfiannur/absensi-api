@@ -10,16 +10,17 @@ import {
   UseInterceptors,
   UploadedFile,
   HttpException,
-  HttpStatus
+  HttpStatus,
+  UseGuards
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { UserService } from './user.service'
-import { UserDTO, AuthDTO } from './user.dto'
+import { UserDTO } from './user.dto'
 import { diskStorage } from 'multer'
 import { extname } from 'path'
 import { unlink } from 'fs'
-import * as bcrypt from 'bcrypt'
-import * as jwt from 'jsonwebtoken'
+import { AuthGuard } from '@nestjs/passport'
+import { hashSync, genSaltSync } from 'bcrypt'
 
 type GetAllQuery = {
   page?: number
@@ -31,6 +32,7 @@ export class UserController {
   constructor(private readonly service: UserService) {}
 
   @Post('/user')
+  @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
     FileInterceptor('picture', {
       storage: diskStorage({
@@ -47,18 +49,25 @@ export class UserController {
   )
   create(@Body() data: UserDTO, @UploadedFile() file: any) {
     data.picture = file.path
+    const salt = genSaltSync(10)
     console.log(data)
+    data.password = hashSync(data.password, salt)
     return this.service.create(data)
   }
 
   @Put('/user/:id')
+  // @UseGuards(AuthGuard('jwt'))
   async update(@Param('id') id: number, @Body() data: UserDTO) {
     const user = await this.service.findById(id)
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+    if (data.password) {
+      data.password = hashSync(data.password, genSaltSync(10))
+    }
     return this.service.update(id, data)
   }
 
   @Put('/user/:id/avatar')
+  @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
     FileInterceptor('picture', {
       storage: diskStorage({
@@ -89,6 +98,7 @@ export class UserController {
   }
 
   @Delete('/user/:id')
+  @UseGuards(AuthGuard('jwt'))
   async delete(@Param('id') id: number) {
     const user = await this.service.findById(id)
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
@@ -110,29 +120,9 @@ export class UserController {
     })
   }
 
-  @Post('/login')
-  async login(@Body() auth: AuthDTO) {
-    const user = await this.service.findByUsername(auth.username)
-
-    if (!user || bcrypt.compareSync(auth.password, user.password))
-      throw new HttpException(
-        'Username or Password invalid',
-        HttpStatus.UNPROCESSABLE_ENTITY
-      )
-
-    const token = jwt.sign(
-      {
-        id: user.id,
-        username: user.username
-      },
-      'gardeaputri',
-      {
-        expiresIn: '7days'
-      }
-    )
-
-    return {
-      token
-    }
+  @Post('/signup')
+  async signup(@Body() signup: UserDTO) {
+    signup.roleId = 2
+    return this.service.create(signup)
   }
 }

@@ -6,14 +6,21 @@ import { UserRoleModule } from './user-role/user-role.module'
 import { UserModule } from './user/user.module'
 import { PresenceModule } from './presence/presence.module'
 import { Connection } from 'typeorm'
-import * as config from 'config';
+import * as config from 'config'
+import { PresenceTypeModule } from './presence-type/presence-type.module'
+import { AuthModule } from './auth/auth.module'
+import { AuthService } from './auth/auth.service'
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(config.get('database')),
+    TypeOrmModule.forRoot({
+      ...config.get('database')
+    }),
     UserRoleModule,
     UserModule,
-    PresenceModule
+    PresenceTypeModule,
+    PresenceModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService]
