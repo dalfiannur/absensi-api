@@ -6,19 +6,11 @@ import { UserRoleModule } from './user-role/user-role.module'
 import { UserModule } from './user/user.module'
 import { PresenceModule } from './presence/presence.module'
 import { Connection } from 'typeorm'
+import * as config from 'config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '1sampai8',
-      database: 'absensi',
-      entities: ['**/*.entity.ts'],
-      synchronize: true
-    }),
+    TypeOrmModule.forRoot(config.get('database')),
     UserRoleModule,
     UserModule,
     PresenceModule

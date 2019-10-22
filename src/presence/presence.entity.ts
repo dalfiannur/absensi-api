@@ -4,31 +4,29 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
-} from 'typeorm';
-import { User } from '../user/user.entity';
+  ManyToOne
+} from 'typeorm'
+import { User } from '../user/user.entity'
 
 @Entity()
 export class Presence {
   @PrimaryGeneratedColumn({
-    type: 'bigint',
+    type: 'bigint'
   })
-  id: number;
+  id: number
 
   @ManyToOne(type => User, user => user.presences, {
     cascade: true,
-    onDelete: 'CASCADE',
+    onDelete: 'CASCADE'
   })
-  user: User;
+  user: User
 
-  @Column({
-    default: true,
-  })
-  status: boolean;
+  @Column()
+  status: boolean
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date
 }

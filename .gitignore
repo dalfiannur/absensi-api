@@ -3,3 +3,4 @@ avatars
 test
 dist
 yarn-error.log
+config/default.json
