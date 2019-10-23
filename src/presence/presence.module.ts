@@ -8,5 +8,6 @@ import { PresenceService } from './presence.service';
   imports: [TypeOrmModule.forFeature([Presence])],
   controllers: [PresenceController],
   providers: [PresenceService],
+  exports: [PresenceService]
 })
 export class PresenceModule {}

@@ -41,8 +41,15 @@ export class User {
   @Column()
   improvement: string
 
-  @Column()
+  @Column({
+    nullable: true
+  })
   picture: string
+
+  @Column({
+    default: false
+  })
+  active: boolean
 
   @ManyToOne(type => UserRole, role => role.users)
   role: UserRole

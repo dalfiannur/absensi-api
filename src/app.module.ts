@@ -9,7 +9,6 @@ import { Connection } from 'typeorm'
 import * as config from 'config'
 import { PresenceTypeModule } from './presence-type/presence-type.module'
 import { AuthModule } from './auth/auth.module'
-import { AuthService } from './auth/auth.service'
 
 @Module({
   imports: [

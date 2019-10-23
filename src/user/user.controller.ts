@@ -48,15 +48,16 @@ export class UserController {
     })
   )
   create(@Body() data: UserDTO, @UploadedFile() file: any) {
-    data.picture = file.path
+    if (file) {
+      data.picture = file.path
+    }
     const salt = genSaltSync(10)
-    console.log(data)
     data.password = hashSync(data.password, salt)
     return this.service.create(data)
   }
 
   @Put('/user/:id')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   async update(@Param('id') id: number, @Body() data: UserDTO) {
     const user = await this.service.findById(id)
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
