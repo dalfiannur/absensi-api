@@ -32,6 +32,10 @@ export class DepartementService {
     return paginate(queryBuilder, options)
   }
 
+  getAllRaw() {
+    return this.repository.find()
+  }
+
   update(id: number, data: DepartementDTO) {
     return this.repository.update({ id }, data)
   }

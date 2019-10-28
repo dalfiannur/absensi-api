@@ -7,7 +7,7 @@ export class DepartementDTO {
   @IsString()
   @IsDefined({ groups: [CREATE] })
   @IsOptional({ groups: [UPDATE] })
-  code: string
+  code?: string
 
   @IsString()
   @IsDefined({ groups: [CREATE] })
