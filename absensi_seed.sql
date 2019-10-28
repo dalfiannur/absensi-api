@@ -43,6 +43,10 @@ INSERT INTO `user_role`(`id`,`name`,`createdAt`,`updatedAt`) VALUES
 
 
 -- Dump data of "presence_type" ----------------------------
+INSERT INTO `presence_type`(`id`,`code`,`name`,`createdAt`,`updatedAt`,`startTime`,`endTime`) VALUES 
+( '1', 'breakfast', 'Breakfast', '2019-10-28 20:13:22.231138', '2019-10-28 20:13:22.231138', '06:00', '10:00' ),
+( '2', 'lunch', 'Lunch', '2019-10-28 20:13:22.231138', '2019-10-28 20:13:22.231138', '10:00', '15:00' ),
+( '3', 'afternoon-meal', 'Afternoon Meal', '2019-10-28 20:13:22.231138', '2019-10-28 20:13:22.231138', '15:00', '18:00' );
 -- ---------------------------------------------------------
 
 
