@@ -21,6 +21,12 @@ export class PresenceType {
   @Column()
   name: string
 
+  @Column()
+  startTime: string
+
+  @Column()
+  endTime: string
+
   @OneToMany(type => Presence, presence => presence.type, {
     cascade: true,
     onDelete: 'CASCADE'

@@ -25,13 +25,13 @@ export class PresenceTypeController {
   constructor(private readonly service: PresenceTypeService) {}
 
   @Post('/presence-type')
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard('jwt'))
   create(@Body() data: PresenceTypeDTO) {
     return this.service.create(data)
   }
 
   @Put('/presence-type/:id')
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard('jwt'))
   async update(@Param('id') id: number, @Body() data: PresenceTypeDTO) {
     const type = await this.service.findById(id)
     if (!type) throw new HttpException('Type not found', HttpStatus.NOT_FOUND)
@@ -39,7 +39,7 @@ export class PresenceTypeController {
   }
 
   @Delete('/presence-type/:id')
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard('jwt'))
   async delete(@Param('id') id: number) {
     const type = await this.service.findById(id)
     if (!type) throw new HttpException('Type not found', HttpStatus.NOT_FOUND)

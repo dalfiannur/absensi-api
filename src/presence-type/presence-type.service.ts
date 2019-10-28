@@ -13,7 +13,8 @@ export class PresenceTypeService {
   ) {}
 
   create(data: PresenceTypeDTO) {
-    return this.repository.insert(data)
+    const type = this.repository.create(data)
+    return this.repository.save(type)
   }
 
   findById(id: number) {

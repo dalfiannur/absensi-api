@@ -13,4 +13,14 @@ export class PresenceTypeDTO {
   @IsDefined({ groups: [CREATE] })
   @IsOptional({ groups: [UPDATE] })
   name: string
+
+  @IsString()
+  @IsDefined({ groups: [CREATE] })
+  @IsOptional({ groups: [UPDATE] })
+  startTime: string
+
+  @IsString()
+  @IsDefined({ groups: [CREATE] })
+  @IsOptional({ groups: [UPDATE] })
+  endTime: string
 }

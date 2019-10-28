@@ -1,3 +1,4 @@
+import * as config from 'config'
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { AppController } from './app.controller'
@@ -6,9 +7,9 @@ import { UserRoleModule } from './user-role/user-role.module'
 import { UserModule } from './user/user.module'
 import { PresenceModule } from './presence/presence.module'
 import { Connection } from 'typeorm'
-import * as config from 'config'
 import { PresenceTypeModule } from './presence-type/presence-type.module'
 import { AuthModule } from './auth/auth.module'
+import { DepartementModule } from './departement/departement.module'
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AuthModule } from './auth/auth.module'
       ...config.get('database')
     }),
     UserRoleModule,
+    DepartementModule,
     UserModule,
     PresenceTypeModule,
     PresenceModule,
