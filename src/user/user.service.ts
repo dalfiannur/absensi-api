@@ -19,7 +19,7 @@ export class UserService {
 
   findById(id: number) {
     return this.repository.findOne(id, {
-      relations: ['role']
+      relations: ['role', 'departement']
     })
   }
 
@@ -27,10 +27,24 @@ export class UserService {
     return this.repository.findOne({ username })
   }
 
+  findByNIK(nik: number) {
+    return this.repository.findOne({
+      where: { nik },
+      join: {
+        alias: 'user',
+        leftJoinAndSelect: {
+          role: 'user.role',
+          departement: 'user.departement'
+        }
+      }
+    })
+  }
+
   getAll(options: IPaginationOptions) {
     const queryBuilder = this.repository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.role', 'role')
+      .leftJoinAndSelect('user.departement', 'departement')
       .select([
         'user.id',
         'user.nik',
@@ -39,7 +53,8 @@ export class UserService {
         'user.picture',
         'user.createdAt',
         'role.id',
-        'role.name'
+        'role.name',
+        'departement.name'
       ])
 
     return paginate(queryBuilder, options)

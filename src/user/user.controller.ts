@@ -113,6 +113,13 @@ export class UserController {
     return user
   }
 
+  @Get('/user/:nik/nik')
+  async findByNIK(@Param('nik') nik: number) {
+    const user = await this.service.findByNIK(nik)
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+    return user
+  }
+
   @Get('/users')
   getAll(@Query() param: GetAllQuery) {
     return this.service.getAll({

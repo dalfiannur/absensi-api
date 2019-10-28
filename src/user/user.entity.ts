@@ -9,6 +9,7 @@ import {
 } from 'typeorm'
 import { Presence } from '../presence/presence.entity'
 import { UserRole } from '../user-role/user-role.entity'
+import { Departement } from 'src/departement/departement.entity'
 
 @Entity()
 export class User {
@@ -19,6 +20,9 @@ export class User {
 
   @Column()
   roleId: number
+
+  @Column()
+  departementId: number
 
   @Column({
     type: 'bigint'
@@ -53,6 +57,9 @@ export class User {
 
   @ManyToOne(type => UserRole, role => role.users)
   role: UserRole
+
+  @ManyToOne(type => Departement, departement => departement.users)
+  departement: Departement
 
   @OneToMany(type => Presence, presence => presence.user)
   presences: Presence[]
