@@ -17,7 +17,10 @@ export class Presence {
   id: number
 
   @Column()
-  status: boolean
+  userId: number
+
+  @Column()
+  typeId: number
 
   @ManyToOne(type => User, user => user.presences, {
     cascade: true,

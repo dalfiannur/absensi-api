@@ -1,4 +1,4 @@
-import { IsDefined, IsNumber, IsBoolean, IsOptional } from 'class-validator';
+import { IsDefined, IsNumber, IsOptional } from 'class-validator';
 import { CrudValidationGroups } from '@nestjsx/crud';
 
 const { CREATE, UPDATE } = CrudValidationGroups;
@@ -9,8 +9,8 @@ export class PresenceDTO {
   @IsOptional({ groups: [UPDATE] })
   userId: number;
 
-  @IsBoolean()
-  @IsDefined({ groups: [CREATE, UPDATE] })
+  @IsNumber()
+  @IsDefined({ groups: [CREATE] })
   @IsOptional({ groups: [UPDATE] })
-  status: boolean;
+  typeId: number;
 }
