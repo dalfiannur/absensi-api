@@ -67,4 +67,15 @@ export class UserService {
   delete(id: number) {
     return this.repository.delete({ id })
   }
+
+  async import(users: UserDTO[]) {
+    const data = await this.repository
+      .createQueryBuilder('user')
+      .insert()
+      .values(users)
+
+    const [sql, args]  = data.getQueryAndParameters()
+    const newSql = sql.replace('INSERT INTO', 'INSERT IGNORE INTO')
+    return this.repository.query(newSql, args)
+  }
 }

@@ -25,7 +25,8 @@ export class User {
   departementId: number
 
   @Column({
-    type: 'bigint'
+    type: 'bigint',
+    unique: true
   })
   nik: number
 
@@ -33,7 +34,8 @@ export class User {
   name: string
 
   @Column({
-    nullable: true
+    nullable: true,
+    unique: true
   })
   username: string
 

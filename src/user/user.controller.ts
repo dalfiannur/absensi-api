@@ -21,6 +21,10 @@ import { extname } from 'path'
 import { unlink } from 'fs'
 import { AuthGuard } from '@nestjs/passport'
 import { hashSync, genSaltSync } from 'bcrypt'
+import * as XLSX from 'xlsx'
+import * as Async from 'async'
+import * as _ from 'lodash'
+import { DepartementService } from 'src/departement/departement.service'
 
 type GetAllQuery = {
   page?: number
@@ -29,7 +33,7 @@ type GetAllQuery = {
 
 @Controller()
 export class UserController {
-  constructor(private readonly service: UserService) {}
+  constructor(private readonly service: UserService, private readonly departement: DepartementService) {}
 
   @Post('/user')
   @UseGuards(AuthGuard('jwt'))
@@ -132,5 +136,51 @@ export class UserController {
   async signup(@Body() signup: UserDTO) {
     signup.roleId = 2
     return this.service.create(signup)
+  }
+
+  @Post('/import-users')
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './files',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString())
+            .join('')
+          cb(null, `${randomName}${extname(file.originalname)}`)
+        }
+      })
+    })
+  )
+  async import(@UploadedFile() file: any) {
+    if (!file) {
+      throw new HttpException('Incorrent File', 422)
+    }
+    const departements = await this.departement.getAllRaw();
+    const wb = XLSX.readFile(file.path)
+    const data: any[] = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 })
+    const users = []
+    for (let j = 1; j < data[0].length; j++) {
+      let user = {
+        roleId: 2
+      }
+      for (let i = 0; i < data[0].length; i++) {
+        let key = data[0][i]
+        let value = data[j][i]
+        if (_.lowerCase(data[0][i]) === 'departement') {
+          key = 'departementId'
+          const index = _.findIndex(departements, (item) => item.code === _.kebabCase(data[j][i]))
+          value = departements[index].id
+        }
+        user = {
+          ...user,
+          [key]: value
+        }
+      }
+      users.push(user)
+    }
+    return this.service.import(users)
   }
 }
