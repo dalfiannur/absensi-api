@@ -162,7 +162,7 @@ export class UserController {
     const wb = XLSX.readFile(file.path)
     const data: any[] = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 })
     const users = []
-    for (let j = 1; j < data[0].length; j++) {
+    for (let j = 1; j < data.length; j++) {
       let user = {
         roleId: 2
       }
