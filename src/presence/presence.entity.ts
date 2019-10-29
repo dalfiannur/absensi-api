@@ -22,10 +22,7 @@ export class Presence {
   @Column()
   typeId: number
 
-  @ManyToOne(type => User, user => user.presences, {
-    cascade: true,
-    onDelete: 'CASCADE'
-  })
+  @ManyToOne(type => User, user => user.presences)
   user: User
 
   @ManyToOne(type => PresenceType, type => type.presences)

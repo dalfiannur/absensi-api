@@ -63,7 +63,9 @@ export class User {
   @ManyToOne(type => Departement, departement => departement.users)
   departement: Departement
 
-  @OneToMany(type => Presence, presence => presence.user)
+  @OneToMany(type => Presence, presence => presence.user, {
+    cascade: true
+  })
   presences: Presence[]
 
   @CreateDateColumn()

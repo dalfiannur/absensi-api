@@ -21,7 +21,20 @@ export class PresenceService {
   }
 
   getAll(options: IPaginationOptions) {
-    const queryBuilder = this.repository.createQueryBuilder('role');
+    const queryBuilder = this.repository.createQueryBuilder('presence')
+      .leftJoinAndSelect('presence.user', 'user')
+      .leftJoinAndSelect('presence.type', 'type')
+      .leftJoinAndSelect('user.departement', 'departement')
+      .select([
+        'presence.id',
+        'presence.createdAt',
+        'user.id',
+        'user.nik',
+        'user.name',
+        'type.id',
+        'type.name',
+        'departement.name'
+      ])
     return paginate(queryBuilder, options);
   }
 

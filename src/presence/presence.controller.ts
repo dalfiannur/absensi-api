@@ -10,41 +10,42 @@ import {
 } from '@nestjs/common';
 import { PresenceService } from './presence.service';
 import { PresenceDTO } from './presence.dto';
+import * as _ from 'lodash'
 
 type GetAllQuery = {
   page?: number;
   limit?: number;
 };
 
-@Controller('presence')
+@Controller()
 export class PresenceController {
   constructor(private readonly service: PresenceService) {}
 
-  @Post()
+  @Post('/presence')
   create(@Body() data: PresenceDTO) {
     return this.service.create(data);
   }
 
-  @Put(':id')
+  @Put('/presence/:id')
   update(@Param('id') id: number, @Body() data: PresenceDTO) {
     return this.service.update(id, data);
   }
 
-  @Delete(':id')
+  @Delete('/presence/:id')
   delete(@Param('id') id: number) {
     return this.service.delete(id);
   }
 
-  @Get(':id')
+  @Get('/presence/:id')
   findOne(@Param('id') id: number) {
     return this.service.findOne(id);
   }
 
-  @Get()
+  @Get('/presences')
   getAll(@Query() param: GetAllQuery) {
-    this.service.getAll({
-      limit: param.limit,
-      page: param.page,
+    return this.service.getAll({
+      limit: _.toInteger(param.limit),
+      page: _.toInteger(param.page),
     });
   }
 }
