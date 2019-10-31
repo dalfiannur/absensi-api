@@ -1,3 +1,4 @@
+import * as moment from 'moment'
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { paginate, IPaginationOptions } from 'nestjs-typeorm-paginate';
@@ -18,6 +19,46 @@ export class PresenceService {
 
   findOne(id: number) {
     return this.repository.findOne(id);
+  }
+
+  countBetweenDate(startDate: Date, endDate: Date, where?: any) {
+    const query = this.repository.createQueryBuilder('presence')
+      .where(`presence.createdAt BETWEEN '${startDate.toISOString()}' AND '${endDate.toISOString()}'`)
+
+    if (where.typeId) {
+      query.andWhere(`typeId=${where.typeId}`)
+    }
+      
+    return query.getCount()
+  }
+
+  async checkByUserIdAndTypeId(userId: number, typeId: number) {
+    const startDate = moment()
+      .utcOffset(0)
+      .set({
+        hour: 0,
+        minute: 0,
+        second: 1
+      })
+      .toISOString()
+
+    const endDate = moment()
+      .utcOffset(0)
+      .set({
+        hours: 23,
+        minutes: 59,
+        seconds: 59
+      })
+      .toISOString()
+
+    const result = await this.repository.createQueryBuilder('presence')
+      .where(`presence.createdAt BETWEEN '${startDate}' AND '${endDate}'`)
+      .andWhere(`presence.userId = ${userId}`)
+      .andWhere(`presence.typeId = ${typeId}`)
+      .getOne()
+
+    if (result) return { exist: true }
+    return { exist: false }
   }
 
   getAll(options: IPaginationOptions) {

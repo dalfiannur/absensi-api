@@ -26,8 +26,14 @@ export class PresenceTypeController {
 
   @Post('/presence-type')
   @UseGuards(AuthGuard('jwt'))
-  create(@Body() data: PresenceTypeDTO) {
+  async create(@Body() data: PresenceTypeDTO) {
     return this.service.create(data)
+      .then(result => {
+        return { ...result.generatedMaps[0], ...data }
+      })
+      .catch(error => {
+        throw new HttpException(error, 422)
+      })
   }
 
   @Put('/presence-type/:id')

@@ -7,11 +7,6 @@ export class PresenceTypeDTO {
   @IsString()
   @IsDefined({ groups: [CREATE] })
   @IsOptional({ groups: [UPDATE] })
-  code: string
-
-  @IsString()
-  @IsDefined({ groups: [CREATE] })
-  @IsOptional({ groups: [UPDATE] })
   name: string
 
   @IsString()

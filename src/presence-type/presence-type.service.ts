@@ -1,3 +1,4 @@
+import * as _ from 'lodash'
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { paginate, IPaginationOptions } from 'nestjs-typeorm-paginate'
@@ -10,11 +11,17 @@ export class PresenceTypeService {
   constructor(
     @InjectRepository(PresenceType)
     private readonly repository: Repository<PresenceType>
-  ) {}
+  ) { }
 
-  create(data: PresenceTypeDTO) {
-    const type = this.repository.create(data)
-    return this.repository.save(type)
+  async create(data: PresenceTypeDTO) {
+    return this.repository.createQueryBuilder('type')
+      .insert()
+      .values({
+        ...data,
+        code: _.kebabCase(data.name)
+      })
+      .execute()
+     
   }
 
   findById(id: number) {

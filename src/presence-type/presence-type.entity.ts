@@ -15,16 +15,25 @@ export class PresenceType {
   })
   id: number
 
-  @Column()
+  @Column({
+    unique: true,
+    nullable: false
+  })
   code: string
 
-  @Column()
+  @Column({
+    nullable: false
+  })
   name: string
 
-  @Column()
+  @Column({
+    nullable: false
+  })
   startTime: string
 
-  @Column()
+  @Column({
+    nullable: false
+  })
   endTime: string
 
   @OneToMany(type => Presence, presence => presence.type, {
