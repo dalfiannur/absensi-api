@@ -1,3 +1,4 @@
+import * as _ from 'lodash'
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { paginate, IPaginationOptions } from 'nestjs-typeorm-paginate'
@@ -13,8 +14,10 @@ export class DepartementService {
   ) {}
 
   create(data: DepartementDTO) {
-    const type = this.repository.create(data)
-    return this.repository.save(type)
+    return this.repository.createQueryBuilder('departement')
+      .insert()
+      .values(data)
+      .execute()
   }
 
   findById(id: number) {

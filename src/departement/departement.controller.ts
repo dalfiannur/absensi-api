@@ -23,41 +23,69 @@ type GetAllQuery = {
 
 @Controller()
 export class DepartementController {
-  constructor(private readonly service: DepartementService) {}
+  constructor(private readonly service: DepartementService) { }
 
   @Post('/departement')
   @UseGuards(AuthGuard('jwt'))
-  create(@Body() data: DepartementDTO) {
-    return this.service.create({
-      ...data,
-      code: _.kebabCase(data.name)
-    })
+  async create(@Body() data: DepartementDTO) {
+    data.code = _.kebabCase(data.name)
+
+    return this.service
+      .create(data)
+      .then(result => ({
+        ...result.generatedMaps[0],
+        ...data
+      }))
+      .catch(error => {
+        throw new HttpException(error, 422)
+      })
   }
 
   @Put('/departement/:id')
   @UseGuards(AuthGuard('jwt'))
   async update(@Param('id') id: number, @Body() data: DepartementDTO) {
-    const type = await this.service.findById(id)
-    if (!type) throw new HttpException('Departement not found', HttpStatus.NOT_FOUND)
-    return this.service.update(id, {
-      ...data,
-      code: _.kebabCase(data.name)
-    })
+    const departement = await this.service.findById(id)
+
+    if (!departement)
+      throw new HttpException('Departement not found', HttpStatus.NOT_FOUND)
+
+    data.code = _.kebabCase(data.name)
+
+    return this.service
+      .update(id, data)
+      .then(() => ({
+        ...departement,
+        ...data
+      }))
+      .catch(error => {
+        throw new HttpException(error, 422)
+      })
   }
 
   @Delete('/departement/:id')
   @UseGuards(AuthGuard('jwt'))
   async delete(@Param('id') id: number) {
-    const type = await this.service.findById(id)
-    if (!type) throw new HttpException('Departement not found', HttpStatus.NOT_FOUND)
-    return this.service.delete(id)
+    const departement = await this.service.findById(id)
+
+    if (!departement)
+      throw new HttpException('Departement not found', HttpStatus.NOT_FOUND)
+
+    return this.service
+      .delete(id)
+      .then(result => result)
+      .catch(error => {
+        throw new HttpException(error, 400)
+      })
   }
 
   @Get('/departement/:id')
   async findById(@Param('id') id: number) {
-    const type = await this.service.findById(id)
-    if (!type) throw new HttpException('Departement not found', HttpStatus.NOT_FOUND)
-    return type
+    const departement = await this.service.findById(id)
+    
+    if (!departement)
+      throw new HttpException('Departement not found', HttpStatus.NOT_FOUND)
+
+    return departement
   }
 
   @Get('/departements')

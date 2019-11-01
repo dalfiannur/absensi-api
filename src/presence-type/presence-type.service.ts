@@ -40,7 +40,14 @@ export class PresenceTypeService {
   }
 
   update(id: number, data: PresenceTypeDTO) {
-    return this.repository.update({ id }, data)
+    return this.repository.createQueryBuilder('type')
+      .update()
+      .set({
+        ...data,
+        code: _.kebabCase(data.name)
+      })
+      .where(`id = ${id}`)
+      .execute()
   }
 
   delete(id: number) {

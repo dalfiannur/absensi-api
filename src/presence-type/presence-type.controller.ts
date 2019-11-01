@@ -1,3 +1,4 @@
+import * as _ from 'lodash'
 import {
   Controller,
   Post,
@@ -42,6 +43,16 @@ export class PresenceTypeController {
     const type = await this.service.findById(id)
     if (!type) throw new HttpException('Type not found', HttpStatus.NOT_FOUND)
     return this.service.update(id, data)
+      .then(result => {
+        return {
+          ...type,
+          ...data,
+          code: _.kebabCase(data.name)
+        }
+      })
+      .catch(error => {
+        throw new HttpException(error, 422)
+      })
   }
 
   @Delete('/presence-type/:id')
@@ -50,6 +61,10 @@ export class PresenceTypeController {
     const type = await this.service.findById(id)
     if (!type) throw new HttpException('Type not found', HttpStatus.NOT_FOUND)
     return this.service.delete(id)
+      .then(result => result)
+      .catch(error => {
+        throw new HttpException(error, 400)
+      })
   }
 
   @Get('/presence-type/:id')

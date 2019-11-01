@@ -15,10 +15,15 @@ export class Departement {
   })
   id: number
 
-  @Column()
+  @Column({
+    unique: true,
+    nullable: false
+  })
   code: string
 
-  @Column()
+  @Column({
+    nullable: false
+  })
   name: string
 
   @OneToMany(type => User, user => user.departement, {
