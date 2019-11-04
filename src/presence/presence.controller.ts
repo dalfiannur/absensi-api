@@ -1,3 +1,6 @@
+import * as _ from 'lodash'
+import * as Moment from 'moment'
+import * as Async from 'async'
 import {
   Controller,
   Post,
@@ -11,18 +14,11 @@ import {
 } from '@nestjs/common';
 import { PresenceService } from './presence.service';
 import { PresenceDTO } from './presence.dto';
-import * as _ from 'lodash'
-import * as moment from 'moment'
 import { AuthGuard } from '@nestjs/passport';
-
-type GetAllQuery = {
-  page?: number;
-  limit?: number;
-};
 
 @Controller()
 export class PresenceController {
-  constructor(private readonly service: PresenceService) {}
+  constructor(private readonly service: PresenceService) { }
 
   @Post('/presence')
   create(@Body() data: PresenceDTO) {
@@ -43,7 +39,7 @@ export class PresenceController {
 
   @Get('/count-presence')
   count(@Query() params: any) {
-    const startDate = moment(params.startDate ? new Date(params.startDate): undefined)
+    const startDate = Moment(params.startDate ? new Date(params.startDate) : undefined)
       .utcOffset(0)
       .set({
         hour: 0,
@@ -52,7 +48,7 @@ export class PresenceController {
       })
       .toDate()
 
-    const endDate = moment(params.endDate ? new Date(params.endDate) : undefined)
+    const endDate = Moment(params.endDate ? new Date(params.endDate) : undefined)
       .utcOffset(0)
       .set({
         hours: 23,
@@ -60,7 +56,7 @@ export class PresenceController {
         seconds: 59
       })
       .toDate()
-    
+
     return this.service.countBetweenDate(startDate, endDate, {
       typeId: params.typeId ? params.typeId : undefined
     });
@@ -77,10 +73,74 @@ export class PresenceController {
   }
 
   @Get('/presences')
-  getAll(@Query() param: GetAllQuery) {
-    return this.service.getAll({
-      limit: _.toInteger(param.limit),
-      page: _.toInteger(param.page),
-    });
+  async getAll(@Query() params: any) {
+    const pagination = {
+      limit: _.toInteger(params.limit),
+      page: _.toInteger(params.page)
+    }
+
+    let typeId = [0]
+    if (params.typeId) {
+      typeId = typeof params.typeId === 'string' ? [params.typeId] : params.typeId
+    }
+
+
+    // if (attended === 'true') {
+    const date = params.date ? Moment(params.date, 'DDMMYYYY') : Moment(new Date())
+
+    const options = {
+      typeId,
+      attended: params.attended && params.attended === 'false' ? false : true,
+      startDate: date.set({
+        hour: 0,
+        minute: 0,
+        second: 1
+      }),
+      endDate: date.set({
+        hours: 23,
+        minutes: 59,
+        seconds: 59
+      })
+    }
+
+    return this.service.getAll(pagination, options);
+    // } else {
+    // const date = params.date ? Moment(params.date, 'DDMMYYYY') : Moment(new Date())
+    // const startDate = date.set({
+    //   hour: 0,
+    //   minute: 0,
+    //   second: 1
+    // })
+    // const endDate = date.set({
+    //   hours: 23,
+    //   minutes: 59,
+    //   seconds: 59
+    // })
+
+    // const options = {
+    //   startDate,
+    //   endDate,
+    //   typeId
+    // }
+
+    // const data = await this.service.getAllNotAttended(pagination, options)
+    // const result = data.pagination
+    // const items = await Async.map(result.items, (item, cb) => {
+    //   cb(null, {
+    //     user: item,
+    //     type: {
+    //       name: data.types.map((item: any) => item.name).join(', ')
+    //     }
+    //   })
+    // })
+
+    // return {
+    //   ...result,
+    //   items
+    // }
+    // return data
+    // }
+
+
   }
 }

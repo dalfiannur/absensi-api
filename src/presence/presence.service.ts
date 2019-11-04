@@ -1,17 +1,24 @@
 import * as moment from 'moment'
+import * as Async from 'async'
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { paginate, IPaginationOptions } from 'nestjs-typeorm-paginate';
 import { Presence } from './presence.entity';
 import { Repository } from 'typeorm';
 import { PresenceDTO } from './presence.dto';
+import { User } from 'src/user/user.entity';
+import { PresenceType } from 'src/presence-type/presence-type.entity';
 
 @Injectable()
 export class PresenceService {
   constructor(
     @InjectRepository(Presence)
     private readonly repository: Repository<Presence>,
-  ) {}
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(PresenceType)
+    private readonly presenceTypeRepository: Repository<PresenceType>
+  ) { }
 
   create(data: PresenceDTO) {
     return this.repository.insert(data);
@@ -28,7 +35,7 @@ export class PresenceService {
     if (where.typeId) {
       query.andWhere(`typeId=${where.typeId}`)
     }
-      
+
     return query.getCount()
   }
 
@@ -61,23 +68,107 @@ export class PresenceService {
     return { exist: false }
   }
 
-  getAll(options: IPaginationOptions) {
-    const queryBuilder = this.repository.createQueryBuilder('presence')
-      .leftJoinAndSelect('presence.user', 'user')
-      .leftJoinAndSelect('presence.type', 'type')
+  async getAll(options: IPaginationOptions, params: any) {
+    let query = this.userRepository.createQueryBuilder('user')
+      .leftJoinAndSelect('user.presences', 'presences')
       .leftJoinAndSelect('user.departement', 'departement')
+      .leftJoinAndSelect('presences.type', 'type')
       .select([
-        'presence.id',
-        'presence.createdAt',
         'user.id',
         'user.nik',
         'user.name',
+        'presences.id',
+        'presences.createdAt',
+        'departement.id',
+        'departement.name',
         'type.id',
-        'type.name',
-        'departement.name'
+        'type.name'
       ])
-    return paginate(queryBuilder, options);
+
+    if (params.attended && params.typeId === 0) {
+      query = query.where('user.id IN (SELECT userId FROM presence)')
+    } else if (params.attended && params.typeId !== 0) {
+      query = query.where(`user.id IN (SELECT userId FROM presence WHERE typeId IN (${params.typeId.join(',') as Number}))`)
+    } else if (!params.attended && params.typeId === 0) {
+      query = query.where('user.id NOT IN (SELECT userId FROM presence)')
+    } else if (!params.attended && params.typeId !== 0) {
+      query = query.where(`user.id NOT IN (SELECT userId FROM presence WHERE typeId IN (${params.typeId.join(',') as Number}))`)
+    }
+
+    // query = query.andWhere(`presences.createdAt BETWEEN '${params.startDate.format()}' AND :end`, {
+    //   end: params.endDate.format()
+    // })
+
+    // console.log(query.getQueryAndParameters())
+
+    return paginate(query, options)
   }
+
+  // getAll(options: IPaginationOptions, params: any) {
+  //   const queryBuilder = this.repository.createQueryBuilder('presence')
+  //     .where(`presence.createdAt BETWEEN '${params.startDate}' AND '${params.endDate}'`)
+  //     .leftJoinAndSelect('presence.user', 'user')
+  //     .leftJoinAndSelect('presence.type', 'type')
+  //     .leftJoinAndSelect('user.departement', 'departement')
+  //     .select([
+  //       'presence.id',
+  //       'presence.createdAt',
+  //       'user.id',
+  //       'user.nik',
+  //       'user.name',
+  //       'type.id',
+  //       'type.name',
+  //       'departement.name'
+  //     ])
+  //   return paginate(queryBuilder, options);
+  // }
+
+  // async getAllNotAttended(options: IPaginationOptions, params: any) {
+  //   const types = await this.presenceTypeRepository.query(`SELECT id, name FROM presence_type WHERE id NOT IN (${params.typeId})`)
+  //   let typeIds = ['0']
+  //   if (types.length > 0) {
+  //     typeIds = await Async.map(types, (item: any, cb) => {
+  //       cb(null, item.id)
+  //     })
+  //   }
+
+  //   const queryBuilder = this.userRepository.createQueryBuilder('user')
+  //     .leftJoinAndSelect('user.departement', 'departement')
+  //     .where(`user.id NOT IN (SELECT p.userId FROM presence p WHERE typeId IN (${typeIds.join(',')}) AND p.createdAt BETWEEN '${params.startDate}' AND '${params.endDate}')`)
+  //     .select([
+  //       'user.id',
+  //       'user.nik',
+  //       'user.name',
+  //       'departement.name'
+  //     ])
+
+  //   return {
+  //     types,
+  //     pagination: await paginate(queryBuilder, options)
+  //   }
+  // }
+
+  // async getAllNotAttended(options: IPaginationOptions, params: any) {
+  //   const query = this.userRepository.createQueryBuilder('user')
+  //     .leftJoinAndSelect('user.presences', 'presences')
+  //     .where(`presences.createdAt BETWEEN :start AND :end`, {
+  //       start: params.startDate,
+  //       end: params.endDate
+  //     })
+  //     .andWhere('presences.typeId NOT IN (:id)', {
+  //       id: params.typeId
+  //     })
+  //     .andWhere(`user.id NOT IN presences.id`)
+  //     .select([
+  //       'user.id',
+  //       'user.nik',
+  //       'user.name',
+  //       'presences.id',
+  //       'presences.createdAt'
+  //     ])
+
+  //   return paginate(query, options)
+  // }
 
   update(id: number, data: PresenceDTO) {
     return this.repository.update({ id }, data);
