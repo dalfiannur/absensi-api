@@ -86,20 +86,16 @@ export class PresenceService {
       ])
 
     if (params.attended && params.typeId === 0) {
-      query = query.where('user.id IN (SELECT userId FROM presence)')
+      query = query.where(`user.id IN (SELECT userId FROM presence WHERE createdAt BETWEEN '${params.startDate}' AND '${params.endDate}')`)
     } else if (params.attended && params.typeId !== 0) {
-      query = query.where(`user.id IN (SELECT userId FROM presence WHERE typeId IN (${params.typeId.join(',') as Number}))`)
+      query = query.where(`user.id IN (SELECT userId FROM presence WHERE typeId = ${params.typeId as Number} AND createdAt BETWEEN '${params.startDate}' AND '${params.endDate}')`)
     } else if (!params.attended && params.typeId === 0) {
-      query = query.where('user.id NOT IN (SELECT userId FROM presence)')
-    } else if (!params.attended && params.typeId !== 0) {
-      query = query.where(`user.id NOT IN (SELECT userId FROM presence WHERE typeId IN (${params.typeId.join(',') as Number}))`)
+      query = query.where(`user.id NOT IN (SELECT userId FROM presence WHERE createdAt BETWEEN '${params.startDate}' AND '${params.endDate}')`)
+    } else {
+      query = query.where(`user.id IN (SELECT userId FROM presence WHERE typeId NOT IN (${params.typeId.join(',') as Number}) AND createdAt BETWEEN '${params.startDate}' AND '${params.endDate}')`)
     }
 
-    // query = query.andWhere(`presences.createdAt BETWEEN '${params.startDate.format()}' AND :end`, {
-    //   end: params.endDate.format()
-    // })
-
-    // console.log(query.getQueryAndParameters())
+    console.log(query.getQuery())
 
     return paginate(query, options)
   }

@@ -79,28 +79,33 @@ export class PresenceController {
       page: _.toInteger(params.page)
     }
 
-    let typeId = [0]
+    let typeId = 0
     if (params.typeId) {
-      typeId = typeof params.typeId === 'string' ? [params.typeId] : params.typeId
+      typeId = params.typeId ? [params.typeId] : params.typeId
     }
 
 
     // if (attended === 'true') {
-    const date = params.date ? Moment(params.date, 'DDMMYYYY') : Moment(new Date())
+    const start = params.date ? Moment.utc(params.date, 'DDMMYYYY') : Moment.utc(new Date())
+    const end = params.date ? Moment.utc(params.date, 'DDMMYYYY') : Moment.utc(new Date())
+    const startDate = start.set({
+      hour: 0,
+      minute: 0,
+      second: 1
+    })
+      .toISOString()
+    const endDate = end.set({
+      hours: 23,
+      minutes: 59,
+      seconds: 59
+    })
+      .toISOString()
 
     const options = {
       typeId,
       attended: params.attended && params.attended === 'false' ? false : true,
-      startDate: date.set({
-        hour: 0,
-        minute: 0,
-        second: 1
-      }),
-      endDate: date.set({
-        hours: 23,
-        minutes: 59,
-        seconds: 59
-      })
+      startDate,
+      endDate
     }
 
     return this.service.getAll(pagination, options);
