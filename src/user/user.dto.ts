@@ -32,6 +32,11 @@ export class UserDTO {
   @IsOptional({ groups: [UPDATE] })
   improvement?: string
 
+  @Length(2, 120)
+  @IsDefined({ groups: [CREATE] })
+  @IsOptional({ groups: [UPDATE] })
+  country?: string
+
   @IsDefined({ groups: [CREATE] })
   @IsOptional({ groups: [UPDATE] })
   picture?: any

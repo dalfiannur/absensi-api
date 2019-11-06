@@ -44,13 +44,20 @@ export class User {
   })
   password: string
 
-  @Column()
+  @Column({
+    nullable: true
+  })
   improvement: string
 
   @Column({
     nullable: true
   })
   picture: string
+
+  @Column({
+    nullable: true
+  })
+  country: string
 
   @Column({
     default: false

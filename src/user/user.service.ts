@@ -10,7 +10,7 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly repository: Repository<User>
-  ) {}
+  ) { }
 
   create(data: UserDTO) {
     const user = this.repository.create(data)
@@ -50,6 +50,7 @@ export class UserService {
         'user.nik',
         'user.name',
         'user.improvement',
+        'user.country',
         'user.picture',
         'user.createdAt',
         'role.id',
@@ -74,7 +75,7 @@ export class UserService {
       .insert()
       .values(users)
 
-    const [sql, args]  = data.getQueryAndParameters()
+    const [sql, args] = data.getQueryAndParameters()
     const newSql = sql.replace('INSERT INTO', 'INSERT IGNORE INTO')
     return this.repository.query(newSql, args)
   }

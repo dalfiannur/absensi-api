@@ -95,8 +95,6 @@ export class PresenceService {
       query = query.where(`user.id NOT IN (SELECT userId FROM presence WHERE typeId IN (${params.typeId.join(',') as Number}) AND createdAt BETWEEN '${params.startDate}' AND '${params.endDate}')`)
     }
 
-    console.log(query.getQuery())
-
     return paginate(query, options)
   }
 
