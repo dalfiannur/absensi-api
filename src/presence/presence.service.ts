@@ -92,7 +92,7 @@ export class PresenceService {
     } else if (!params.attended && params.typeId === 0) {
       query = query.where(`user.id NOT IN (SELECT userId FROM presence WHERE createdAt BETWEEN '${params.startDate}' AND '${params.endDate}')`)
     } else {
-      query = query.where(`user.id IN (SELECT userId FROM presence WHERE typeId NOT IN (${params.typeId.join(',') as Number}) AND createdAt BETWEEN '${params.startDate}' AND '${params.endDate}')`)
+      query = query.where(`user.id NOT IN (SELECT userId FROM presence WHERE typeId IN (${params.typeId.join(',') as Number}) AND createdAt BETWEEN '${params.startDate}' AND '${params.endDate}')`)
     }
 
     console.log(query.getQuery())
