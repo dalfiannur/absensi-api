@@ -33,14 +33,14 @@ type GetAllQuery = {
 
 @Controller()
 export class UserController {
-  constructor(private readonly service: UserService, private readonly departement: DepartementService) {}
+  constructor(private readonly service: UserService, private readonly departement: DepartementService) { }
 
   @Post('/user')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
     FileInterceptor('picture', {
       storage: diskStorage({
-        destination: './avatars',
+        destination: './public/avatars',
         filename: (req, file, cb) => {
           const randomName = Array(32)
             .fill(null)
@@ -76,7 +76,7 @@ export class UserController {
   @UseInterceptors(
     FileInterceptor('picture', {
       storage: diskStorage({
-        destination: './avatars',
+        destination: './public/avatars',
         filename: (req, file, cb) => {
           const randomName = Array(32)
             .fill(null)

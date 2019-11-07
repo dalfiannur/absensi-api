@@ -10,11 +10,16 @@ import { Connection } from 'typeorm'
 import { PresenceTypeModule } from './presence-type/presence-type.module'
 import { AuthModule } from './auth/auth.module'
 import { DepartementModule } from './departement/departement.module'
+import { ServeStaticModule } from '@nestjs/serve-static'
+import { join } from 'path'
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       ...config.get('database')
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
     }),
     UserRoleModule,
     DepartementModule,
@@ -27,5 +32,5 @@ import { DepartementModule } from './departement/departement.module'
   providers: [AppService]
 })
 export class AppModule {
-  constructor(private readonly connection: Connection) {}
+  constructor(private readonly connection: Connection) { }
 }
