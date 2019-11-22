@@ -10,7 +10,7 @@ export class UserDTO {
 
   @IsDefined({ groups: [CREATE] })
   @IsOptional({ groups: [UPDATE] })
-  nik?: number
+  nik?: string
 
   @Length(2, 150)
   @IsDefined({ groups: [CREATE] })

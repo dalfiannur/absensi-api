@@ -25,10 +25,9 @@ export class User {
   departementId: number
 
   @Column({
-    type: 'bigint',
     unique: true
   })
-  nik: number
+  nik: string
 
   @Column()
   name: string
