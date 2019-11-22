@@ -58,3 +58,4 @@ INSERT INTO `presence_type`(`id`,`code`,`name`,`createdAt`,`updatedAt`,`startTim
 -- ---------------------------------------------------------
 
 
+presence
